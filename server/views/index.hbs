@@ -1,0 +1,28 @@
+<script>
+  var socket = io.connect('http://localhost');
+
+  socket.on('words', function (words) {
+    _.each(words, function (dict) {
+      var div = $('<div class="word ui-draggable"><p>' + dict.word + '</p></div>');
+
+      div.appendTo('body');
+      div.offset(dict.location);
+
+      div.attr("data-word", dict.word);
+
+      div.draggable({
+        start: function(event, ui) {
+
+        },
+        stop: function(event, ui) {
+          socket.emit("move", {word:div.data().word, location:ui.offset})
+        }
+      });
+    });
+  });
+
+  socket.on('move', function(data) {
+    var div = $("div[data-word='" + data.word +"']");
+    div.offset(data.location);
+  });
+</script>
